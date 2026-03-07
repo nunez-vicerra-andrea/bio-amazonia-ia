@@ -6,8 +6,12 @@ import os
 import base64
 import json
 
-# 1. CONFIGURACIÓN DE PÁGINA
-st.set_page_config(page_title="BioAmazonía v2", page_icon="🌳", layout="centered")
+# 1. CONFIGURACIÓN DE PÁGINA - ¡Actualizado con tu nuevo logo!
+st.set_page_config(
+    page_title="BioAmazonía IA", 
+    page_icon="logo_bio.png", # Ahora usará el guacamayo como icono
+    layout="centered"
+)
 
 # --- FUNCIONES DE CARGA ---
 
@@ -20,19 +24,24 @@ def get_base64(bin_file):
     return None
 
 def cargar_info_json():
-    """Carga la base de datos de especies desde la subcarpeta correcta"""
-    # Ajustamos la ruta a la subcarpeta que indicaste
-    ruta_json = os.path.join("bio_amazonia", "especies.json")
+    """Carga la base de datos de especies"""
+    # Usamos la ruta directa según tu estructura de carpetas
+    ruta_json = "especies.json" 
     if os.path.exists(ruta_json):
         with open(ruta_json, 'r', encoding='utf-8') as f:
             return json.load(f)
     else:
-        st.error(f"❌ No se encontró el archivo: {ruta_json}")
+        # Si no lo encuentra, intentamos en la subcarpeta por si acaso
+        ruta_alt = os.path.join("bio_amazonia", "especies.json")
+        if os.path.exists(ruta_alt):
+            with open(ruta_alt, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        st.error(f"❌ No se encontró el archivo especies.json")
         return {}
 
 # --- CARGA DE RECURSOS ---
-# Intentamos cargar desde la subcarpeta
-path_fondo = os.path.join("bio_amazonia", "fondo.jpg")
+# Ajustamos las rutas a la raíz del proyecto según tu imagen de VS Code
+path_fondo = "fondo.jpg" 
 INFO_ESPECIES = cargar_info_json()
 clases = sorted(list(INFO_ESPECIES.keys())) if INFO_ESPECIES else []
 
@@ -40,14 +49,15 @@ bin_str = get_base64(path_fondo)
 if bin_str:
     fondo_css = f"""
     <style>
-.stApp {{
-    background-image: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
-                      url("data:image/jpg;base64,{bin_str}");
-    background-size: 100% 100%;
-    background-position: center;
-}}
-</style>
-"""
+    .stApp {{
+        background-image: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                          url("data:image/jpg;base64,{bin_str}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }}
+    </style>
+    """
 else:
     fondo_css = "<style>.stApp { background-color: #e8f5e9; }</style>"
 
@@ -85,6 +95,7 @@ st.markdown("""
 # 3. MODELO IA
 @st.cache_resource
 def load_model_ia():
+    # Ruta corregida según tu carpeta 'models'
     path = os.path.join("models", "modelo_amazonia_v2.h5")
     return tf.keras.models.load_model(path) if os.path.exists(path) else None
 
@@ -104,11 +115,13 @@ if archivo and model and INFO_ESPECIES:
         st.image(img, use_container_width=True)
     
     with col_res:
+        # Preprocesamiento de la imagen
         img_res = img.resize((224, 224))
         img_arr = np.array(img_res)
         if img_arr.shape[-1] == 4: img_arr = img_arr[:,:,:3]
         img_arr = np.expand_dims(img_arr / 255.0, axis=0)
         
+        # Predicción
         res = model.predict(img_arr)
         idx = np.argmax(res[0])
         conf = res[0][idx] * 100
@@ -124,5 +137,6 @@ if archivo and model and INFO_ESPECIES:
         else:
             st.warning("⚠️ **IDENTIFICACIÓN INCIERTA**")
             st.write(f"Parece un: {info['comun']}")
+            st.write(f"Confianza: **{conf:.2f}%**")
 
 st.markdown("<br><hr><center><small>🌿 Proyecto BioAmazonía 2026</small></center>", unsafe_allow_html=True)
