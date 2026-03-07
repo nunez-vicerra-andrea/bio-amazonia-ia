@@ -8,7 +8,7 @@ import json
 
 # 1. CONFIGURACIÓN DE PÁGINA - ¡Actualizado con tu nuevo logo!
 st.set_page_config(
-    page_title="BioAmazonía IA", 
+    page_title="BioAmazonía v2", 
     page_icon="logo_bio.png", # Ahora usará el guacamayo como icono
     layout="centered"
 )
