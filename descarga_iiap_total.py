@@ -7,12 +7,14 @@ TRAIN_PATH = "bio_amazonia/dataset/train"
 # Nombres clave para buscar en los resultados
 objetivos = ["paiche", "gamitana", "macao", "micrantha", "lagothrix"]
 
+headers = {"User-Agent": "BioAmazoniaBot/1.0 (andrea.nunez@example.com)"}
+
 def escaneo_profundo_iiap():
     print("Iniciando escaneo profundo en la base de datos del IIAP...")
     
     try:
         # Pedimos una lista grande de especies a la API
-        res = requests.get(f"{BASE_URL}/species?page=1&pageSize=200", timeout=20)
+        res = requests.get(f"{BASE_URL}/species?page=1&pageSize=200", timeout=20, headers=headers)
         data = res.json()
         
         # Manejamos si la respuesta es lista o diccionario
@@ -37,7 +39,7 @@ def escaneo_profundo_iiap():
                         target_dir = os.path.join(TRAIN_PATH, folder)
                         os.makedirs(target_dir, exist_ok=True)
                         
-                        img_data = requests.get(img_url).content
+                        img_data = requests.get(img_url, headers=headers).content
                         with open(f"{target_dir}/{folder}_iiap_oficial.jpg", "wb") as f:
                             f.write(img_data)
                         

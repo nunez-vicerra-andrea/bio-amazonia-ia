@@ -33,7 +33,7 @@ for folder, name in species.items():
                 # Solo bajar si es JPG o PNG real
                 if img_url.lower().endswith(('.jpg', '.jpeg', '.png')):
                     try:
-                        img_data = requests.get(img_url, timeout=10).content
+                        img_data = requests.get(img_url, timeout=10, headers=headers).content
                         with open(f"{base_path}/{folder}/{folder}_{count}.jpg", "wb") as f:
                             f.write(img_data)
                         print(f"  > Guardada foto {count}")

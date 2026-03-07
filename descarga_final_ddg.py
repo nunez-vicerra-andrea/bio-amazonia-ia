@@ -26,11 +26,11 @@ def descargar_imagenes():
             # Buscamos 40 imágenes por especie
             results = ddgs.images(search_term, max_results=40)
             
-            count = 1
+            headers = {"User-Agent": "BioAmazoniaBot/1.0 (andrea.nunez@example.com)"}
             for res in results:
                 try:
                     img_url = res['image']
-                    r = requests.get(img_url, timeout=5)
+                    r = requests.get(img_url, timeout=5, headers=headers)
                     if r.status_code == 200:
                         with open(f"{path}/{folder}_{count}.jpg", "wb") as f:
                             f.write(r.content)
