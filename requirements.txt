@@ -1,1 +1,4 @@
-pip freeze > requirements.txt
+streamlit==1.54.0
+tensorflow-cpu==2.15.0
+Pillow==12.1.1
+numpy==2.4.2
